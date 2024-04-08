@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: time_tracking
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: boris
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: my_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
