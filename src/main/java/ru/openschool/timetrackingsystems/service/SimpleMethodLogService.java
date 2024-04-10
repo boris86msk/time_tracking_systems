@@ -10,18 +10,25 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class SimpleMethodLogRepository implements MethodLogService {
+public class SimpleMethodLogService implements MethodLogService {
     private final MethodLogRepository methodLogRepository;
 
     @Async
     @Override
-    public void saveTracking(long nano, long millis, String name, boolean sinch) {
+    public void saveTracking(long nano, long millis, String name, boolean sync) {
         MethodLog methodLog = new MethodLog();
         methodLog.setName(name);
         methodLog.setExecuted(LocalDateTime.now());
-        methodLog.setNanoSecond(nano);
-        methodLog.setMilliSecond(millis);
-        methodLog.setAsynchronous(sinch);
+        if(millis > 5) {
+            methodLog.setMilliSecond(millis);
+        } else if(millis < 1) {
+            methodLog.setNanoSecond(nano);
+        } else {
+            methodLog.setMilliSecond(millis);
+            methodLog.setNanoSecond(nano);
+        }
+        methodLog.setAsynchronous(sync);
+
         methodLogRepository.save(methodLog);
     }
 }
