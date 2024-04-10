@@ -28,6 +28,15 @@
 доступно на http://localhost:8081/</p>
 
 ### API
+Информация о методах возвращается в формате JSON, пример:<br />
+{<br />
+"id": 17,<br />
+"name": "myTestMethod",<br />
+"executed": "2024-04-08T21:24:21.016002",<br />
+"nanoSecond": 2089100,<br />
+"milliSecond": 2,<br />
+"asynchronous": false<br />
+}
 + GET /allTracking - полный список обработанных методов.
 + GET /fast_methods - методы с временем выполнения менее 1 мс.
 + GET /long_methods - методы с временем выполнения более 1 сек.

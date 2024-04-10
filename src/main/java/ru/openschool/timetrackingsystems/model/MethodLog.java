@@ -14,14 +14,19 @@ public class MethodLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "method_name")
     private String name;
+
     @Column(name = "executed")
     private LocalDateTime executed;
+
     @Column(name = "execution_nano")
     private long nanoSecond;
+
     @Column(name = "execution_millis")
     private long milliSecond;
+
     @Column(name = "asynchronous")
     private boolean asynchronous;
 }

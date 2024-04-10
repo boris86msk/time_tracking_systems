@@ -1,22 +1,23 @@
 package ru.openschool.timetrackingsystems.aspect;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import ru.openschool.timetrackingsystems.service.MethodLogService;
-
-import java.util.concurrent.CompletableFuture;
 
 @Component
 @Aspect
 @RequiredArgsConstructor
+@Slf4j
 public class TimeTrackingAspect {
     private final MethodLogService methodLogService;
 
-    @Pointcut("@annotation(ru.openschool.timetrackingsystems.annotation.TrackTime)")
+    @Pointcut("execution(@ru.openschool.timetrackingsystems.annotation.TrackTime * *(..))")
     public void synchronTrackingPointcut() {
     }
 
@@ -25,32 +26,38 @@ public class TimeTrackingAspect {
     }
 
     @Around("synchronTrackingPointcut()")
-    public void synchronMethod(ProceedingJoinPoint joinPoint) throws Throwable {
-        timeTrack(joinPoint, false);
+    public Object synchronMethod(ProceedingJoinPoint joinPoint) {
+        Object result = null;
+        try {
+            result = timeTrack(joinPoint, false);
+        } catch (Throwable e) {
+            log.error("RuntimeException: " + e);
+        }
+        return result;
     }
 
+    @Async
     @Around("asynchronTrackingPointcut()")
-    public Object asynchronMethod(ProceedingJoinPoint joinPoint) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                timeTrack(joinPoint, true);
-            } catch (Throwable e) {
-                e.getStackTrace();
-            }
-        });
+    public void asynchronMethod(ProceedingJoinPoint joinPoint) {
+        try {
+            timeTrack(joinPoint, true);
+        } catch (Throwable e) {
+            log.error("RuntimeException: " + e);
+        }
     }
 
-    private void timeTrack(ProceedingJoinPoint joinPoint, boolean async) throws Throwable {
+    private Object timeTrack(ProceedingJoinPoint joinPoint, boolean async) throws Throwable {
         String methodName = joinPoint.getSignature().getName();
         long startMillis = System.currentTimeMillis();
         long startNano = System.nanoTime();
 
-        joinPoint.proceed();
+        Object result = joinPoint.proceed();
 
         long endNano = System.nanoTime();
         long endMillis = System.currentTimeMillis();
 
         methodLogService.saveTracking(endNano - startNano, endMillis - startMillis,
                 methodName, async);
+        return result;
     }
 }

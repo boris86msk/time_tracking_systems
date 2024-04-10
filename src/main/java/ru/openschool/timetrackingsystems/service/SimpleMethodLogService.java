@@ -1,6 +1,7 @@
 package ru.openschool.timetrackingsystems.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.openschool.timetrackingsystems.model.MethodLog;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SimpleMethodLogService implements MethodLogService {
     private final MethodLogRepository methodLogRepository;
 
